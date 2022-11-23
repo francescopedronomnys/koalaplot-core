@@ -190,7 +190,7 @@ public fun PieChart(
     minPieDiameter: Dp = 100.dp,
     maxPieDiameter: Dp = 300.dp,
     animationSpec: AnimationSpec<Float> = KoalaPlotTheme.animationSpec,
-    labelAnimationSpec: AnimationSpec<Float> = tween(LabelFadeInDuration, 0, LinearOutSlowInEasing)
+    labelAnimationSpec: AnimationSpec<Float>? = tween(LabelFadeInDuration, 0, LinearOutSlowInEasing)
 ) {
     require(holeSize in 0f..1f) { "holeSize must be between 0 and 1" }
     require(labelSpacing >= 1f) { "labelSpacing must be greater than 1" }
@@ -198,12 +198,12 @@ public fun PieChart(
 
     // Animate pie growth whenever elements change, also modified alpha of labels
     val beta = remember(values) { Animatable(0f) }
-    val labelAlpha = remember(values) { Animatable(0f) }
+    val labelAlpha = labelAnimationSpec?.let { remember(values) { Animatable(0f) } }
 
     LaunchedEffect(values) {
         beta.animateTo(1f, animationSpec = animationSpec)
         // fade in labels after pie animation is complete
-        labelAlpha.animateTo(
+        labelAlpha?.animateTo(
             1f,
             animationSpec = labelAnimationSpec
         )
@@ -233,7 +233,7 @@ public fun PieChart(
                 pieSliceData.indices.forEach {
                     // Wrapping in box ensures there is 1 measurable element
                     // emitted per label & applies fade animation
-                    Box(modifier = Modifier.alpha(labelAlpha.value)) {
+                    Box(modifier = Modifier.alpha(labelAlpha?.value ?: 1f)) {
                         label(it)
                     }
                 }
@@ -268,7 +268,7 @@ public fun PieChart(
 
             val connectorPlaceables = subcompose("connectors") {
                 pieSliceData.indices.forEach {
-                    Box(modifier = Modifier.fillMaxSize().alpha(labelAlpha.value)) {
+                    Box(modifier = Modifier.fillMaxSize().alpha(labelAlpha?.value ?: 1f)) {
                         with(labelConnectorTranslations[it].second) {
                             labelConnector(it)
                         }
