@@ -189,7 +189,8 @@ public fun PieChart(
     holeContent: @Composable () -> Unit = {},
     minPieDiameter: Dp = 100.dp,
     maxPieDiameter: Dp = 300.dp,
-    animationSpec: AnimationSpec<Float> = KoalaPlotTheme.animationSpec
+    animationSpec: AnimationSpec<Float> = KoalaPlotTheme.animationSpec,
+    labelAnimationSpec: AnimationSpec<Float> = tween(LabelFadeInDuration, 0, LinearOutSlowInEasing)
 ) {
     require(holeSize in 0f..1f) { "holeSize must be between 0 and 1" }
     require(labelSpacing >= 1f) { "labelSpacing must be greater than 1" }
@@ -204,7 +205,7 @@ public fun PieChart(
         // fade in labels after pie animation is complete
         labelAlpha.animateTo(
             1f,
-            animationSpec = tween(LabelFadeInDuration, 0, LinearOutSlowInEasing)
+            animationSpec = labelAnimationSpec
         )
     }
 
